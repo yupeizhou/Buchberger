@@ -10,7 +10,7 @@ class Polynomial:
         """
         The constructor. The polynomials will be grouped by terms and sorted in grevlex order.
         @param monomials: Array of monomials that make up the polynomial.
-        each monomial is represented as an array of exponents on variables including the coefficient.
+        Each monomial is represented as an array of exponents on variables including the coefficient.
         """
 
         assert len(monomials) > 0, 'There should be at least 1 monomials in the polynomial'
@@ -45,7 +45,7 @@ class Polynomial:
         else:
             grouped_monomials.append(monomial)
 
-        # Check if the resulting polynomial is a zero polynomial
+        # Only keep nonzero monomials
         grouped_monomials = np.array(grouped_monomials)
         filtered_monomials = []
         for monomial in grouped_monomials:
@@ -53,12 +53,12 @@ class Polynomial:
                 filtered_monomials.append(monomial)
         grouped_monomials = np.array(filtered_monomials)
 
+        # Check if the resulting polynomial is a zero polynomial
         if len(grouped_monomials) > 0:
             self.monomials = grouped_monomials
             self.nvar = len(grouped_monomials[0]) - 1
             self.nterm = len(grouped_monomials)
             self.degree = grouped_monomials[:, 1:].sum(axis = 1).max()
-
         else:
             self.nvar = len(monomials[0]) - 1
             self.nterm = 0
@@ -80,7 +80,7 @@ class Polynomial:
     def __repr__(self):
         """
         Print the polynomial in usual form in variables x1, x2, ...
-        @return: The printed polynomial.
+        @return: Polynomial printed in string.
         """
 
         if not self.is_zero():
@@ -101,8 +101,8 @@ class Polynomial:
 
     def lt(self):
         """
-        Get the leading term in the polynomial using the grevlex order.
-        @return: leading term represented as an array of exponents.
+        Get the leading term in the polynomial under the grevlex order.
+        @return: Leading term represented as a polynomial object.
         """
 
         leading_term = self.monomials[0]
@@ -112,8 +112,8 @@ class Polynomial:
     def add(self, poly):
         """
         Add one polynomial to another polynomial.
-        @param poly: another polynomial to add to.
-        @return: sum of the two polynomials.
+        @param poly: Another polynomial to add to.
+        @return: Sum of the two polynomials represented as a polynomial object.
         """
 
         assert isinstance(poly, Polynomial), 'Can only add to a polynomial'
@@ -125,22 +125,20 @@ class Polynomial:
     def subtract(self, poly):
         """
         Add one polynomial from another polynomial.
-        @param poly: another polynomial subtract.
-        @return: difference of the two polynomials.
+        @param poly: Another polynomial subtract.
+        @return: Difference of the two polynomials represented as a polynomial object.
         """
 
         assert isinstance(poly, Polynomial), 'Can only subtract a polynomial'
 
-        poly_subtract = np.array([np.concatenate([np.array([-1 * monomial[0]]), monomial[1:]]) for monomial in poly.monomials])
-        poly_subtract = Polynomial(poly_subtract)
-        return self.add(poly_subtract)
+        return self.add(poly.scalar_multiply(-1))
 
 
     def multiply(self, poly):
         """
         Multiply one polynomial with another polynomial.
-        @param poly: another polynomial to multiply with.
-        @return: product of the two polynomials.
+        @param poly: Another polynomial to multiply with.
+        @return: Product of the two polynomials represented as a polynomial object.
         """
 
         assert isinstance(poly, Polynomial), 'Can only multiply with polynomial'
@@ -154,10 +152,27 @@ class Polynomial:
 
         return Polynomial(poly_product)
 
+    def scalar_multiply(self, scalar):
+        """
+        Multiply one polynomial with a scalar.
+        @param scalar: The scalar to multiply with the polynomial. Can be integer or float.
+        @return: Product of the scalar with the polynomial represented as a polynomial object.
+        """
+
+        assert isinstance(scalar, (int, float)), 'Scalar multiplication only.'
+
+        poly_scalar_prod = []
+        for monomial in self.monomials:
+            product = np.concatenate([np.array([monomial[0] * scalar]), monomial[1:]])
+            poly_scalar_prod.append(product)
+        poly_scalar_prod = np.array(poly_scalar_prod)
+
+        return Polynomial(poly_scalar_prod)
+
 
 def compare(monomial1, monomial2):
     """
-    Compare two monomials using the grevlex order.
+    Compare two monomials under the grevlex order, disregarding the coefficient.
     @param monomial1: The 1st monomial for comparison, represented as an array of exponents.
     @param monomial2: The 2nd monomial for comparison, represented as an array of exponents.
     @return: 1 if monomial1 is larger, -1 if monomial2 is larger, 0 if they are the same.
@@ -187,7 +202,7 @@ def mergesort(arr):
     """
     A modified mergesort algorithm to sort the monomials of a polynomial in descending grevlex order.
     @param arr: Array of monomials that make up the polynomial.
-    @return: sorted array of monomials.
+    @return: Sorted array of monomials.
     """
     if len(arr) > 1:
         middle = math.floor(len(arr) / 2)
@@ -205,7 +220,7 @@ def merge(left, right, arr):
     @param left: The left array in the mergesort algorithm.
     @param right: The right array in the mergesort algorithm.
     @param arr: The original array to be modified during the merge step.
-    @return: merged array.
+    @return: Merged array of monomials.
     """
 
     # Append the 'infinity' array to both left and right to assist in the merge step
