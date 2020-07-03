@@ -152,6 +152,7 @@ class Polynomial:
 
         return Polynomial(poly_product)
 
+
     def scalar_multiply(self, scalar):
         """
         Multiply one polynomial with a scalar.
@@ -168,6 +169,25 @@ class Polynomial:
         poly_scalar_prod = np.array(poly_scalar_prod)
 
         return Polynomial(poly_scalar_prod)
+
+
+    def divide(self, monomial):
+        """
+        Return the ratio of the polynomial to another polynomial.
+        @param monomial: Another monomial being the divisor.
+        @return: The ratio of the two polynomials represented as a polynomial object if one divides the other,
+        return false if one does not divide the other.
+        """
+
+        assert self.nterm == 1, 'This only works for monomials.'
+        assert monomial.nterm == 1, 'This only works for monomials'
+
+        if (self.monomials[0][1:] >= monomial.monomials[0][1:]).all():
+            ratio = np.concatenate([np.array([self.monomials[0][0] / monomial.monomials[0][0]]),
+            self.monomials[0][1:] - monomial.monomials[0][1:]])
+            return Polynomial(np.array([ratio]))
+        else:
+            return False
 
 
 def compare(monomial1, monomial2):
@@ -204,6 +224,7 @@ def mergesort(arr):
     @param arr: Array of monomials that make up the polynomial.
     @return: Sorted array of monomials.
     """
+    
     if len(arr) > 1:
         middle = math.floor(len(arr) / 2)
         left = arr[:middle]
