@@ -1,4 +1,4 @@
-from polynomial import *
+import polynomial as poly
 import numpy as np
 import math
 import random
@@ -11,6 +11,9 @@ def reduce(f, g):
     @return: The one step reduction represented as a polynomial object if the leading term of g divides the leading term of f,
     return False if not.
     """
+
+    assert isinstance(f, poly.Polynomial), 'The input must be a polynomial.'
+    assert isinstance(g, poly.Polynomial), 'The input must be a polynomial.'
 
     ratio = (f.lt()).divide(g.lt())
     if ratio:
@@ -28,16 +31,34 @@ def reduce_lst(f, G):
     @return: The result of complete reduction represented as a polynomial object.
     """
 
+    assert isinstance(f, poly.Polynomial), 'The input must be a polynomial.'
+    assert all([isinstance(g, poly.Polynomial) for g in G]), 'The input must be a list of polynomials.'
+
     r = f
-    lst = []
-    for g in G:
-        if (r.lt()).divide(g.lt()):
-            lst.append(g)
+    lst = [g for g in G if (r.lt()).divide(g.lt())]
     while len(lst) > 0:
         random_g = random.choice(lst)
         r = reduce(r, random_g)
-        lst = []
-        for g in G:
-            if (r.lt()).divide(g.lt()):
-                lst.append(g)
+        if not r.is_zero():
+            lst = [g for g in G if (r.lt()).divide(g.lt())]
+        else:
+            lst = []
     return r
+
+
+def S(f, g):
+    """
+    Compute the S polynomial of polynomials f and g.
+    @param f: Polynomial f.
+    @param g: Polynomial g.
+    @return: The S polynomial represented as a polynomial object.
+    """
+
+    assert isinstance(f, poly.Polynomial), 'The input must be a polynomial.'
+    assert isinstance(g, poly.Polynomial), 'The input must be a polynomial.'
+
+    lt_f = f.lt()
+    lt_g = g.lt()
+    lcm_fg = lt_f.lcm(lt_g)
+
+    return (f.multiply(lcm_fg.divide(lt_f))).subtract(g.multiply(lcm_fg.divide(lt_g)))
