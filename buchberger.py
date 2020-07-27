@@ -15,15 +15,21 @@ def buchberger_random(F):
 
     G = F
     P = set([frozenset([F[i], F[j]]) for i in range(len(F)) for j in range(i + 1, len(F))])
+    counter = 1
+    print('------------------')
     while len(P) > 0:
         fg = random.sample(P, 1)[0]
         f, g = tuple(fg)
+        print('Iteration {}:'.format(counter))
+        print('The choice of pair is {} and {}'.format(f, g))
         P.remove(fg)
         r = rd.reduce_lst(rd.S(f, g), G)
+        print('r is {}'.format(r))
         if not r.is_zero():
             P = P.union([frozenset([f, r]) for f in G])
             G = list(set(G).union([r]))
-
+        counter += 1
+        print('------------------')
     return G
 
 
@@ -51,17 +57,25 @@ def buchberger_first(F):
     G = F
     P = [frozenset([F[i], F[j]]) for i in range(len(F)) for j in range(i + 1, len(F))]
     P = remove_duplicate(P)
+    counter = 1
+    print('------------------')
     while len(P) > 0:
         fg = P.pop(0)
         f, g = tuple(fg)
+        print('Iteration {}:'.format(counter))
+        print('The choice of pair is {} and {}'.format(f, g))
         r = rd.reduce_lst(rd.S(f, g), G)
+        print('r is {}'.format(r))
         if not r.is_zero():
             for f in G:
                 P.append(frozenset([f, r]))
             P = remove_duplicate(P)
             G = list(set(G).union([r]))
+        counter += 1
+        print('------------------')
 
     return G
+
 
 def buchberger_degree(F):
     """
@@ -76,6 +90,8 @@ def buchberger_degree(F):
     P = [frozenset([F[i], F[j]]) for i in range(len(F)) for j in range(i + 1, len(F))]
     P = remove_duplicate(P)
     total_degree = [(list(x)[0].lt().lcm(list(x)[1].lt())).degree for x in P]
+    counter = 1
+    print('------------------')
     while len(P) > 0:
         min_degree = min(total_degree)
         min_index = total_degree.index(min_degree)
@@ -83,12 +99,17 @@ def buchberger_degree(F):
         P.remove(fg)
         total_degree.remove(min_degree)
         f, g = tuple(fg)
+        print('Iteration {}:'.format(counter))
+        print('The choice of pair is {} and {}'.format(f, g))
         r = rd.reduce_lst(rd.S(f, g), G)
+        print('r is {}'.format(r))
         if not r.is_zero():
             for f in G:
                 P.append(frozenset([f, r]))
             P = remove_duplicate(P)
             G = list(set(G).union([r]))
             total_degree = [(list(x)[0].lt().lcm(list(x)[1].lt())).degree for x in P]
+        counter += 1
+        print('------------------')
 
     return G
