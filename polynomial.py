@@ -184,7 +184,7 @@ class Polynomial:
 
         if self.nterm == 0:
             return Polynomial(np.array([np.zeros(self.nvar + 1)]))
-            
+
         if (self.monomials[0][1:] >= monomial.monomials[0][1:]).all():
             ratio = np.concatenate([np.array([self.monomials[0][0] / monomial.monomials[0][0]]),
             self.monomials[0][1:] - monomial.monomials[0][1:]])
@@ -204,7 +204,7 @@ class Polynomial:
         assert monomial.nterm == 1, 'This only works for monomials.'
 
         return Polynomial(np.maximum(self.monomials, monomial.monomials))
-
+        
 
 def compare(monomial1, monomial2):
     """
