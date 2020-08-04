@@ -49,7 +49,7 @@ class Polynomial:
         grouped_monomials = np.array(grouped_monomials)
         filtered_monomials = []
         for monomial in grouped_monomials:
-            if monomial[0] != 0:
+            if (monomial[0] != 0) and not math.isclose(monomial[0], 0, abs_tol = 1e-5):
                 filtered_monomials.append(monomial)
         grouped_monomials = np.array(filtered_monomials)
 
@@ -204,7 +204,7 @@ class Polynomial:
         assert monomial.nterm == 1, 'This only works for monomials.'
 
         return Polynomial(np.maximum(self.monomials, monomial.monomials))
-        
+
 
 def compare(monomial1, monomial2):
     """

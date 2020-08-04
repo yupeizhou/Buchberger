@@ -41,6 +41,7 @@ def reduce_lst(f, G):
         random_g = random.choice(lst)
         r = reduce(r, random_g)
         num_add += 1
+        print(r)
         if not r.is_zero():
             lst = [g for g in G if (r.lt()).divide(g.lt())]
         else:
