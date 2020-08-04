@@ -34,16 +34,18 @@ def reduce_lst(f, G):
     assert isinstance(f, poly.Polynomial), 'The input must be a polynomial.'
     assert all([isinstance(g, poly.Polynomial) for g in G]), 'The input must be a list of polynomials.'
 
+    num_add = 0
     r = f
     lst = [g for g in G if (r.lt()).divide(g.lt())]
     while len(lst) > 0:
         random_g = random.choice(lst)
         r = reduce(r, random_g)
+        num_add += 1
         if not r.is_zero():
             lst = [g for g in G if (r.lt()).divide(g.lt())]
         else:
             lst = []
-    return r
+    return r, num_add
 
 
 def S(f, g):
