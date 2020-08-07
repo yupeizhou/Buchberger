@@ -1,5 +1,7 @@
 import numpy as np
+import finite_field as ff
 import math
+
 
 class Polynomial:
     """
@@ -35,10 +37,10 @@ class Polynomial:
                     monomial = np.array([])
             else:
                 if len(monomial) == 0:
-                    monomial = np.concatenate([np.array([arr[arr_ix][0] + arr[arr_ix + 1][0]]), arr[arr_ix][1:]])
+                    monomial = np.concatenate([np.array([ff.ff_add(arr[arr_ix][0], arr[arr_ix + 1][0])]), arr[arr_ix][1:]])
                     arr_ix += 1
                 else:
-                    monomial = np.concatenate([np.array([monomial[0] + arr[arr_ix + 1][0]]), arr[arr_ix][1:]])
+                    monomial = np.concatenate([np.array([ff.ff_add(monomial[0] + arr[arr_ix + 1][0])]), arr[arr_ix][1:]])
                     arr_ix += 1
         if len(monomial) == 0:
             grouped_monomials.append(arr[arr_ix])
@@ -49,8 +51,8 @@ class Polynomial:
         grouped_monomials = np.array(grouped_monomials)
         filtered_monomials = []
         for monomial in grouped_monomials:
-            if (monomial[0] != 0) and not math.isclose(monomial[0], 0, abs_tol = 1e-5):
-                filtered_monomials.append(monomial)
+            if (monomial[0] % ff.p != 0):
+                filtered_monomials.append(np.concatenate([np.array([monomial[0] % ff.p]), monomial[1:]]))
         grouped_monomials = np.array(filtered_monomials)
 
         # Check if the resulting polynomial is a zero polynomial
@@ -146,7 +148,7 @@ class Polynomial:
         poly_product = []
         for monomial1 in self.monomials:
             for monomial2 in poly.monomials:
-                product = np.concatenate([np.array([monomial1[0] * monomial2[0]]), monomial1[1:] + monomial2[1:]])
+                product = np.concatenate([np.array([ff.ff_mul(monomial1[0], monomial2[0])]), monomial1[1:] + monomial2[1:]])
                 poly_product.append(product)
         poly_product = np.array(poly_product)
 
@@ -186,7 +188,7 @@ class Polynomial:
             return Polynomial(np.array([np.zeros(self.nvar + 1)]))
 
         if (self.monomials[0][1:] >= monomial.monomials[0][1:]).all():
-            ratio = np.concatenate([np.array([self.monomials[0][0] / monomial.monomials[0][0]]),
+            ratio = np.concatenate([np.array([ff.ff_div(self.monomials[0][0], monomial.monomials[0][0])]),
             self.monomials[0][1:] - monomial.monomials[0][1:]])
             return Polynomial(np.array([ratio]))
         else:
